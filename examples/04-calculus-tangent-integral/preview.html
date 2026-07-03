@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GeoGebra Animation Preview</title>
+<script>
+  var __params = new URLSearchParams(location.search);
+  if (__params.has("embed")) {
+    document.documentElement.classList.add("embed");
+  }
+  var __style = __params.get("style") || "light";
+  if (__style === "light" || __style === "dark") {
+    document.documentElement.dataset.animationStyle = __style;
+  }
+</script>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; font: 14px/1.5 -apple-system, "Segoe UI", system-ui, sans-serif; }
+  body { display: flex; flex-direction: column; }
+  #bar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+    padding: 8px 12px; border-bottom: 1px solid #8884; background: Canvas;
+  }
+  #bar .title { font-weight: 600; margin-right: 8px; }
+  #bar .spacer { flex: 1; }
+  button {
+    font: inherit; padding: 6px 12px; border: 1px solid #8886; border-radius: 8px;
+    background: #8881; cursor: pointer;
+  }
+  button:hover { background: #8883; }
+  button.primary { background: #1e88e5; color: #fff; border-color: #1e88e5; }
+  button.active { border-color: #8ab4f8; box-shadow: 0 0 0 2px rgb(138 180 248 / 28%); }
+  button:disabled { opacity: .5; cursor: default; }
+  #ggb { flex: 1; min-height: 0; background: #fbfcfe; }
+  html[data-animation-style="dark"] body { color: #e6edf7; background: #0b1020; }
+  html[data-animation-style="dark"] #bar,
+  html[data-animation-style="dark"] #status,
+  html[data-animation-style="dark"] #copy-buffer { border-color: #253149; background: #111827; }
+  html[data-animation-style="dark"] #ggb { background: #0b1020; }
+  #status {
+    font: 12px/1.5 ui-monospace, Menlo, Consolas, monospace;
+    max-height: 30vh; overflow: auto; padding: 10px 12px; border-top: 1px solid #8884;
+    white-space: pre-wrap; display: none; background: Canvas;
+  }
+  #status.show { display: block; min-height: 120px; }
+  #status .ok { color: #2e7d32; }
+  #status .err { color: #c62828; font-weight: 600; }
+  #status .info { opacity: .8; }
+  #copy-buffer {
+    display: none; width: 100%; min-height: 110px; max-height: 24vh; resize: vertical;
+    padding: 10px 12px; border: 0; border-top: 1px solid #8884; outline: none;
+    font: 12px/1.5 ui-monospace, Menlo, Consolas, monospace;
+    color: inherit; background: Canvas; white-space: pre;
+  }
+  #copy-buffer.show { display: block; }
+  .embed body { overflow: hidden; }
+  .embed #bar, .embed #status, .embed #copy-buffer { display: none !important; }
+  .embed #ggb { height: 100vh; }
+</style>
+</head>
+<body>
+  <div id="bar">
+    <span class="title" id="title">GeoGebra Animation</span>
+    <button id="btn-play" class="primary" disabled>▶︎ Play</button>
+    <button id="btn-reset" disabled>↺ Reset</button>
+    <span class="spacer"></span>
+    <button id="btn-ggb" disabled title="For GeoGebra Classic 6">⬇ Classic 6 .ggb</button>
+    <button id="btn-copy" disabled>⧉ Copy Commands</button>
+    <button id="btn-script" disabled>⬇ script.txt</button>
+    <button id="btn-log">Log</button>
+  </div>
+  <div id="ggb"></div>
+  <pre id="status"></pre>
+  <textarea id="copy-buffer" readonly aria-label="Command script copy buffer"></textarea>
+
+  <!-- Official GeoGebra engine. Preview and export use the same engine. -->
+  <script>window.__SCENE__ = {"$schema":"geogebra-anim/v1","title":"calculus-tangent-integral","app":"classic","view":{"coords":[-3.2,3.2,-1.2,4.2],"axes":true,"grid":true,"axisRatio":[1,1]},"objects":["t = Slider(-2.45, 2.45, 0.02, 0.65, 200, false, true, true, false)","f(x) = 0.12*x^3 - 0.45*x + 1.8","df(x) = 0.36*x^2 - 0.45","P = (t, f(t))","D = (t, df(t))","q(x) = f(t) + df(t)*(x - t)","area = Integral(f, -2.45, t)","LeftBase = (-2.45, 0)","Foot = (t, 0)","base = Segment(LeftBase, Foot)","height = Segment(Foot, P)","A = (-2.8, f(-2.8))","lSec = Line(A, P)","SetVisibleInView(LeftBase, 1, false)","SetVisibleInView(Foot, 1, false)","SetColor(f, \"#4C78A8\")","SetLineThickness(f, 5)","SetColor(df, \"#72B7B2\")","SetLineThickness(df, 3)","SetLineStyle(df, 1)","SetColor(q, \"#E45756\")","SetLineThickness(q, 4)","SetColor(area, \"#F58518\")","SetFilling(area, 0.35)","SetColor(base, \"#9D755D\")","SetLineThickness(base, 3)","SetColor(height, \"#9D755D\")","SetLineStyle(height, 2)","SetColor(lSec, \"#B279A2\")","SetLineStyle(lSec, 1)","SetColor(P, \"#E45756\")","SetPointSize(P, 7)","SetTrace(P, true)","SetColor(D, \"#72B7B2\")","SetPointSize(D, 6)","SetTrace(D, true)","ShowLabel(P, false)","ShowLabel(D, false)","ShowLabel(area, false)","ShowLabel(LeftBase, false)","ShowLabel(Foot, false)","ShowLabel(base, false)","ShowLabel(height, false)","ShowLabel(A, false)","ShowLabel(lSec, false)"],"animate":[{"target":"t","speed":0.65,"direction":"increasing"}],"autoplay":true,"captureAt":0,"notes":"Calculus example: point P moves along the function curve and the tangent is driven by derivative df(t). The area object shows the integral from the left endpoint to t, while D tracks the matching point on the derivative curve.","exportFormat":"classic"}; window.__ANIMATION_STYLES__ = {"light":{"label":"Light Animation","view":{"background":"#FBFCFE","axes":"#2F3A4C","grid":"#E3EAF2","slider":"#2F3A4C"},"colors":{"#4C78A8":"#3B6FD8","#1F77B4":"#0B79B7","#72B7B2":"#0E8F87","#54A24B":"#2F9B63","#F58518":"#E78A00","#E45756":"#D84A5F","#B279A2":"#7A5CCF","#9D755D":"#6B7280","#111827":"#111827"},"fillings":{"0.18":"0.20","0.35":"0.32","0.55":"0.50"}},"dark":{"label":"Dark Animation","view":{"background":"#0B1020","axes":"#AEBBD2","grid":"#253149","slider":"#E6EDF7"},"colors":{"#4C78A8":"#86A8FF","#1F77B4":"#38BDF8","#72B7B2":"#52D6C5","#54A24B":"#8BE8B0","#F58518":"#F8C45C","#E45756":"#F47C8E","#B279A2":"#C2B2FF","#9D755D":"#C5D0E0","#111827":"#F5F7FB"},"fillings":{"0.18":"0.30","0.35":"0.36","0.55":"0.48"}}};</script>
+  <script src="https://www.geogebra.org/apps/deployggb.js"></script>
+  <script>
+  "use strict";
+  // ------------------------------------------------------------------ State
+  var api = null;            // ggbApplet API object, available after appletOnLoad.
+  var scene = null;          // Scene object, the single source of truth.
+  var clock = null;          // Main clock slider name: scene.animate[0].target.
+  var captureAt = 0;         // Clock value used before export.
+  var built = { ok: false, errors: [], lines: [] };
+  var embedded = document.documentElement.classList.contains("embed");
+
+  var statusEl = document.getElementById("status");
+  var copyBufferEl = document.getElementById("copy-buffer");
+  var logLines = [];
+  function log(msg, cls) {
+    logLines.push({ msg: msg, cls: cls || "info" });
+    render();
+  }
+  function render() {
+    statusEl.innerHTML = logLines.length
+      ? logLines.map(function (l) { return '<span class="' + l.cls + '">' + escapeHtml(l.msg) + "</span>"; }).join("\n")
+      : '<span class="info">No log entries yet.</span>';
+    statusEl.scrollTop = statusEl.scrollHeight;
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; });
+  }
+  function escapeRegExp(s) { return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+  function cjkSnippets(text) {
+    var snippets = [];
+    var seen = {};
+    var re = /[^\n\r]{0,40}[\u3400-\u9FFF][^\n\r]{0,40}/g;
+    var m;
+    while ((m = re.exec(String(text || "")))) {
+      var s = m[0].trim();
+      if (!seen[s]) {
+        seen[s] = true;
+        snippets.push(s);
+      }
+      if (snippets.length >= 8) break;
+    }
+    return snippets;
+  }
+  function xmlDesktopCommandIssues(xml) {
+    var risky = {
+      Segment: 1, Polygon: 1, Line: 1, Circle: 1, Ray: 1, Vector: 1, Midpoint: 1,
+      PerpendicularLine: 1, PerpendicularBisector: 1, ParallelLine: 1,
+      CircularArc: 1, CircularSector: 1
+    };
+    var issues = [];
+    var commandRe = /<command\b[^>]*\bname="([^"]+)"[^>]*>[\s\S]*?<input\b([^>]*)\/>[\s\S]*?<\/command>/g;
+    var m;
+    while ((m = commandRe.exec(String(xml || "")))) {
+      if (!risky[m[1]]) continue;
+      var attrRe = /\ba\d+="([^"]*)"/g;
+      var a;
+      while ((a = attrRe.exec(m[2]))) {
+        var value = a[1].trim();
+        if (value.charAt(0) === "(") issues.push(m[1] + " has inline point input " + value);
+      }
+    }
+    return issues;
+  }
+  function definedObjectNames() {
+    var names = [];
+    (scene.objects || []).forEach(function (o) {
+      var m = cmdOf(o).match(/^\s*([A-Za-z_]\w*)\s*:?=(?!=)/);
+      if (m) names.push(m[1]);
+    });
+    return names;
+  }
+  function showStatus(on) {
+    var next = typeof on === "boolean" ? on : !statusEl.classList.contains("show");
+    statusEl.classList.toggle("show", next);
+    if (!next) copyBufferEl.classList.remove("show");
+    var button = document.getElementById("btn-log");
+    button.classList.toggle("active", next);
+    button.setAttribute("aria-pressed", next ? "true" : "false");
+    render();
+  }
+  function pulseButton(button, text) {
+    var old = button.textContent;
+    button.textContent = text;
+    button.classList.add("active");
+    setTimeout(function () {
+      button.textContent = old;
+      button.classList.remove("active");
+    }, 1400);
+  }
+
+  // Extract the command string. objects accepts "cmd" or {cmd, expect}.
+  function cmdOf(o) { return typeof o === "string" ? o : (o && o.cmd) || ""; }
+  function commandsText() { return (scene.objects || []).map(cmdOf).join("\n"); }
+  function safeName() { return (scene.title || "geogebra-animation").replace(/[^\w.\-]+/g, "-"); }
+  function selectedAnimationStyle() {
+    var name = "";
+    try { name = new URLSearchParams(location.search).get("style") || "light"; } catch (e) { name = "light"; }
+    var styles = window.__ANIMATION_STYLES__ || {};
+    return styles[name] ? name : "";
+  }
+  function rewriteSetColor(cmd, theme) {
+    var colors = theme && theme.colors;
+    if (!colors) return cmd;
+    return String(cmd).replace(/(SetColor\s*\(\s*[^,]+,\s*")#([0-9a-fA-F]{6})(")/g, function (_, head, hex, tail) {
+      var next = colors["#" + hex.toUpperCase()];
+      return next ? head + next + tail : head + "#" + hex + tail;
+    });
+  }
+  function rewriteSetFilling(cmd, theme) {
+    var fillings = theme && theme.fillings;
+    if (!fillings) return cmd;
+    return String(cmd).replace(/(SetFilling\s*\(\s*[^,]+,\s*)([0-9]*\.?[0-9]+)(\s*\))/g, function (_, head, raw, tail) {
+      var exact = fillings[raw];
+      var fixed = fillings[Number(raw).toFixed(2)];
+      return head + (exact || fixed || raw) + tail;
+    });
+  }
+  function rewriteStyleCommand(cmd, theme) {
+    return rewriteSetFilling(rewriteSetColor(cmd, theme), theme);
+  }
+  function styleCommand(o, theme) {
+    if (typeof o === "string") return rewriteStyleCommand(o, theme);
+    if (!o || typeof o !== "object") return o;
+    var copy = {};
+    Object.keys(o).forEach(function (k) { copy[k] = o[k]; });
+    if (copy.cmd) copy.cmd = rewriteStyleCommand(copy.cmd, theme);
+    return copy;
+  }
+  function applyAnimationStyle(raw) {
+    var styleName = selectedAnimationStyle();
+    if (!styleName) return raw;
+    var theme = (window.__ANIMATION_STYLES__ || {})[styleName] || {};
+    var styled = {};
+    Object.keys(raw || {}).forEach(function (k) { styled[k] = raw[k]; });
+    styled.objects = (raw.objects || []).map(function (o) { return styleCommand(o, theme); });
+    styled.animationStyle = styleName;
+    return styled;
+  }
+  function definedNamesFromObjects(objects) {
+    var names = [];
+    var seen = {};
+    (objects || []).forEach(function (o) {
+      var m = cmdOf(o).match(/^\s*([A-Za-z_]\w*)\s*:?=(?!=)/);
+      if (m && !seen[m[1]]) {
+        seen[m[1]] = true;
+        names.push(m[1]);
+      }
+    });
+    return names;
+  }
+  function explicitShowLabelNames(objects) {
+    var names = {};
+    (objects || []).forEach(function (o) {
+      var m = cmdOf(o).match(/^\s*ShowLabel\s*\(\s*([A-Za-z_]\w*)\s*,/);
+      if (m) names[m[1]] = true;
+    });
+    return names;
+  }
+  function prepareClassic6Scene(raw) {
+    var copy = {};
+    Object.keys(raw || {}).forEach(function (k) { copy[k] = raw[k]; });
+    var objects = (raw.objects || []).slice();
+    var explicit = explicitShowLabelNames(objects);
+    var animationTargets = {};
+    (raw.animate || []).forEach(function (a) { if (a && a.target) animationTargets[a.target] = true; });
+    definedNamesFromObjects(objects).forEach(function (label) {
+      if (!animationTargets[label] && !explicit[label]) objects.push("ShowLabel(" + label + ", false)");
+    });
+    copy.app = "classic";
+    copy.exportFormat = "classic";
+    copy.objects = objects;
+    return copy;
+  }
+  function exportTargetInfo() {
+    return {
+      format: "classic",
+      appName: "classic",
+      label: "Classic 6 .ggb",
+      target: "GeoGebra Classic 6",
+      note: "uses the same Classic 6 construction state as this preview"
+    };
+  }
+  function quoteGeoGebraString(s) {
+    return String(s).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  }
+  function applyAnimationViewStyle(styleName) {
+    var theme = (window.__ANIMATION_STYLES__ || {})[styleName || ""];
+    var view = theme && theme.view;
+    if (!view) return;
+    try {
+      if (api.setGraphicsOptions) {
+        api.setGraphicsOptions(1, {
+          bgColor: view.background,
+          axesColor: view.axes,
+          gridColor: view.grid
+        });
+      }
+    } catch (e) {}
+    try {
+      if (view.background) api.evalCommand('SetBackgroundColor("' + quoteGeoGebraString(view.background) + '")');
+    } catch (e) {}
+    try {
+      if (clock && view.slider) {
+        api.evalCommand('SetColor(' + clock + ', "' + quoteGeoGebraString(view.slider) + '")');
+        api.evalCommand('SetLabelColor(' + clock + ', "' + quoteGeoGebraString(view.slider) + '")');
+      }
+    } catch (e) {}
+  }
+
+  // ------------------------------------------------------------------ Load scene
+  function loadScene() {
+    if (window.__SCENE__) return Promise.resolve(window.__SCENE__); // CLI inline mode
+    return fetch("scene.json", { cache: "no-store" }).then(function (r) {
+      if (!r.ok) throw new Error("Cannot read scene.json (" + r.status + ")");
+      return r.json();
+    });
+  }
+
+  // ------------------------------------------------------------------ Boot
+  function boot() {
+    if (typeof GGBApplet === "undefined") {
+      log("Failed to load deployggb.js. Check the network or use the offline GeoGebra Math Apps Bundle.", "err");
+      statusEl.classList.add("show");
+      return;
+    }
+    loadScene().then(function (s) { inject(prepareClassic6Scene(applyAnimationStyle(s))); }).catch(function (e) {
+      log("Failed to load scene: " + e.message, "err");
+      statusEl.classList.add("show");
+    });
+  }
+
+  function inject(s) {
+    scene = s;
+    document.getElementById("title").textContent = scene.title || "GeoGebra Animation";
+    document.title = (scene.title || "GeoGebra") + " · Preview";
+    var host = document.getElementById("ggb");
+    var params = {
+      appName: scene.app || "classic",
+      language: "en",
+      width: host.clientWidth || window.innerWidth,
+      height: host.clientHeight || (embedded ? window.innerHeight : window.innerHeight - 120),
+      showToolBar: false,
+      showMenuBar: false,
+      showAlgebraInput: false,
+      showResetIcon: false,
+      enableRightClick: true,
+      enableShiftDragZoom: true,
+      showZoomButtons: !embedded,
+      appletOnLoad: onLoad,
+      // The view is applied again in onLoad so it is captured by getBase64.
+      showToolBarHelp: false
+    };
+    new GGBApplet(params, true).inject("ggb");
+  }
+
+  // ------------------------------------------------------------------ Build
+  function onLoad(ggbApi) {
+    api = ggbApi;
+    window.api = ggbApi; // Used by the headless CLI for check/export.
+
+    // Disable modal error dialogs so headless runs cannot hang on bad commands.
+    try { api.setErrorDialogsActive(false); } catch (e) {}
+    try { api.setPerspective("G"); } catch (e) {} // Keep only the graphics view.
+
+    applyView(scene.view || {});
+    buildObjects(scene.objects || []);
+    patchDirections(scene.animate || []); // Best-effort animation direction patch.
+    applyView(scene.view || {});          // Re-apply the view after setXML.
+    applyAnimationViewStyle(scene.animationStyle);
+    applyAnimate(scene.animate || []);
+
+    // Export frame. Defaults to the clock slider minimum.
+    captureAt = (typeof scene.captureAt === "number") ? scene.captureAt : sliderMin(clock);
+
+    // Ready. The following window.* hooks are used by headless check/export.
+    enableButtons(true);
+    window.__BUILD__ = built;          // Build result: { ok, errors, lines }
+    window.__CLOCK__ = clock;          // Main clock slider name.
+    window.__CAPTURE_AT__ = captureAt; // Export frame value.
+    // Single source of .ggb base64. Download and CLI export share this logic.
+    window.__getGGBBase64 = function () {
+      return new Promise(function (res) {
+        try { api.stopAnimation(); } catch (e) {}
+        try { if (clock) api.setValue(clock, captureAt); } catch (e) {}
+        api.getBase64(res);
+      });
+    };
+    window.__reloadGGBBase64 = function (b64) {
+      return new Promise(function (res) {
+        try {
+          api.setBase64(b64, function () {
+            var xml = "";
+            try { xml = api.getXML(); } catch (e) {}
+            res({ ok: !!xml, xmlLength: xml.length });
+          });
+        } catch (e) {
+          res({ ok: false, error: e && e.message ? e.message : String(e) });
+        }
+      });
+    };
+    window.__freshLoadGGBBase64 = function (b64, labels, appName) {
+      return new Promise(function (res) {
+        var id = "ggb-fresh-" + Date.now() + "-" + Math.random().toString(36).slice(2);
+        var host = document.createElement("div");
+        var done = false;
+        host.id = id;
+        host.style.position = "fixed";
+        host.style.left = "-10000px";
+        host.style.top = "0";
+        host.style.width = "900px";
+        host.style.height = "600px";
+        host.style.overflow = "hidden";
+        document.body.appendChild(host);
+        function finish(result) {
+          if (done) return;
+          done = true;
+          result = result || {};
+          result.dialogText = result.dialogText || "";
+          result.ok = !!result.ok;
+          setTimeout(function () { try { host.remove(); } catch (e) {} }, 0);
+          res(result);
+        }
+        function visibleErrorText() {
+          var text = "";
+          try { text = document.body.innerText || ""; } catch (e) {}
+          var m = text.match(/(Error|Open file failed|processing of command|\u6253\u5F00\u6587\u4EF6\u5931\u8D25|\u5904\u7406\u547D\u4EE4)[\s\S]{0,800}/);
+          return m ? m[0] : "";
+        }
+        var params = {
+          appName: appName || scene.app || "classic",
+          language: "en",
+          width: 900,
+          height: 600,
+          showToolBar: false,
+          showMenuBar: false,
+          showAlgebraInput: false,
+          ggbBase64: b64,
+          appletOnLoad: function (freshApi) {
+            setTimeout(function () {
+              var missing = (labels || []).filter(function (label) {
+                try { return !freshApi.exists(label); } catch (e) { return true; }
+              });
+              var dialogText = visibleErrorText();
+              finish({ ok: missing.length === 0 && !dialogText, missing: missing, dialogText: dialogText });
+            }, 500);
+          }
+        };
+        try {
+          new GGBApplet(params, true).inject(id);
+        } catch (e) {
+          finish({ ok: false, missing: labels || [], dialogText: e && e.message ? e.message : String(e) });
+        }
+        setTimeout(function () {
+          finish({ ok: false, missing: labels || [], dialogText: visibleErrorText() || "Timed out while loading .ggb into a fresh applet." });
+        }, 20000);
+      });
+    };
+    window.__READY__ = true;           // Headless readiness flag.
+
+    if (scene.autoplay !== false && clock) { startPlay(); }
+
+    log(built.ok ? "Build complete. All commands passed." : "Build complete, but at least one command failed.", built.ok ? "ok" : "err");
+    if (!built.ok) statusEl.classList.add("show");
+  }
+
+  function applyView(v) {
+    applyViewTo(api, v);
+  }
+  function applyViewTo(targetApi, v) {
+    try {
+      if (Array.isArray(v.coords) && v.coords.length === 4) {
+        targetApi.setCoordSystem(v.coords[0], v.coords[1], v.coords[2], v.coords[3]);
+      }
+      var ax = v.axes !== false;
+      targetApi.setAxesVisible(ax, ax);
+      targetApi.setGridVisible(!!v.grid);
+      if (Array.isArray(v.axisRatio) && v.axisRatio.length === 2) {
+        targetApi.evalCommand("SetAxesRatio(" + v.axisRatio[0] + ", " + v.axisRatio[1] + ")");
+      }
+    } catch (e) { log("Failed to apply view: " + e.message, "err"); }
+  }
+
+  // Scripting commands do not create objects; evalCommand may return false even when they work.
+  var SCRIPTING = {
+    SetColor: 1, SetBackgroundColor: 1, SetDynamicColor: 1, SetLabelColor: 1,
+    SetPointSize: 1, SetPointStyle: 1, SetLineThickness: 1, SetLineStyle: 1, SetFilling: 1,
+    SetVisibleInView: 1, SetLabelMode: 1, SetCaption: 1, SetTrace: 1, SetValue: 1, SetCoords: 1,
+    SetConditionToShowObject: 1, SetLayer: 1, SetTooltipMode: 1, SetFixed: 1, SetSpinSpeed: 1,
+    ShowLabel: 1, StartAnimation: 1, SelectObjects: 1, Delete: 1, Rename: 1, PlaySound: 1
+  };
+  // Success rules vary by command type:
+  //  assign  (name=... / f(x)=...) -> success means exists(name)
+  //  script  (SetColor, SetTrace)  -> false return still counts as success
+  //  create  (bare command)        -> trust evalCommand return
+  function classify(cmd) {
+    var mAssign = cmd.match(/^\s*([A-Za-z_]\w*)\s*(?:\([^)]*\))?\s*:?=(?!=)/);
+    if (mAssign) return { kind: "assign", name: mAssign[1] };
+    var mHead = cmd.match(/^\s*([A-Za-z]\w*)\s*\(/);
+    if (mHead && SCRIPTING[mHead[1]]) return { kind: "script" };
+    return { kind: "create" };
+  }
+
+  function buildObjects(objs) {
+    built = { ok: true, errors: [], lines: [] };
+    for (var i = 0; i < objs.length; i++) {
+      var cmd = cmdOf(objs[i]);
+      if (!cmd.trim()) continue;
+      var ret = false;
+      try { ret = api.evalCommand(cmd); } catch (e) { ret = false; }
+      var cls = classify(cmd);
+      var ok = cls.kind === "assign" ? objExists(cls.name) : cls.kind === "script" ? true : ret;
+      built.lines.push({ i: i, cmd: cmd, ok: ok, kind: cls.kind });
+      if (ok) {
+        log("[" + (i + 1) + "] ✓ " + cmd + (cls.kind === "script" ? "  (script command)" : ""), "ok");
+      } else {
+        built.ok = false;
+        built.errors.push({ i: i, cmd: cmd });
+        log("[" + (i + 1) + "] ✗ Command failed: " + cmd, "err");
+        log("  -> Check English command names, explicit *, dependency order, and whether the selected app supports this command.", "info");
+        break; // Stop at the first real failure because later commands usually depend on it.
+      }
+    }
+    // Assert that the animation target exists.
+    clock = firstTarget(scene.animate);
+    if (clock && !objExists(clock)) {
+      built.ok = false;
+      built.errors.push({ i: -1, cmd: "animate.target '" + clock + "' does not exist" });
+      log("✗ Animation target '" + clock + "' is not defined. Check animate.target and objects.", "err");
+    }
+  }
+
+  function objExists(name) {
+    try { return !!api.exists(name); } catch (e) {
+      try { return !!api.isDefined(name); } catch (e2) { return false; }
+    }
+  }
+  function firstTarget(anim) { return (anim && anim[0] && anim[0].target) || null; }
+  function sliderMin(name) {
+    if (!name) return 0;
+    try { var v = api.getValue(name); return typeof v === "number" ? 0 : 0; } catch (e) { return 0; }
+  }
+
+  // Best-effort animation direction patch:
+  // oscillating(0), increasing(1), decreasing(2), increasing-once(3).
+  // It edits the slider <animation type="X"> in XML and loads it back.
+  function patchDirections(anim) {
+    var map = { oscillating: 0, increasing: 1, decreasing: 2, "increasing-once": 3 };
+    if (!anim || !anim.length) return;
+    var xml, changed = false;
+    try { xml = api.getXML(); } catch (e) { return; }
+    for (var k = 0; k < anim.length; k++) {
+      var a = anim[k];
+      var t = map[a.direction || "oscillating"];
+      if (t === undefined || t === 0) continue;
+      var re = new RegExp('(<element\\b[^>]*\\blabel="' + escapeRegExp(a.target) + '"[\\s\\S]*?<animation\\b[^>]*\\btype=")\\d+(")');
+      var nx = xml.replace(re, "$1" + t + "$2");
+      if (nx !== xml) { xml = nx; changed = true; }
+    }
+    if (changed) { try { api.setXML(xml); } catch (e) { log("Failed to set animation direction. Falling back to default oscillation: " + e.message, "info"); } }
+  }
+
+  function applyAnimate(anim) {
+    applyAnimateTo(api, anim);
+  }
+  function applyAnimateTo(targetApi, anim) {
+    for (var k = 0; k < (anim || []).length; k++) {
+      var a = anim[k];
+      try {
+        if (typeof a.speed === "number") targetApi.setAnimationSpeed(a.target, a.speed);
+        targetApi.setAnimating(a.target, true);
+      } catch (e) {}
+    }
+  }
+
+  // ------------------------------------------------------------------ Playback controls
+  var playing = false;
+  function startPlay() { try { api.startAnimation(); playing = true; syncPlayBtn(); } catch (e) {} }
+  function stopPlay() { try { api.stopAnimation(); playing = false; syncPlayBtn(); } catch (e) {} }
+  function togglePlay() { playing ? stopPlay() : startPlay(); }
+  function syncPlayBtn() {
+    var b = document.getElementById("btn-play");
+    b.textContent = playing ? "⏸ Pause" : "▶︎ Play";
+  }
+  function resetClock() {
+    stopPlay();
+    try { if (clock) api.setValue(clock, captureAt); } catch (e) {}
+  }
+
+  // ------------------------------------------------------------------ Export
+  function ggbBase64ToBlob(b64) {
+    var bin = atob(b64), arr = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    return new Blob([arr], { type: "application/vnd.geogebra.file" });
+  }
+  function download(filename, blob) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1000);
+  }
+  function objExistsFor(targetApi, name) {
+    try { return !!targetApi.exists(name); } catch (e) {
+      try { return !!targetApi.isDefined(name); } catch (e2) { return false; }
+    }
+  }
+  function localizedCommandNames(xml) {
+    var names = {};
+    var out = [];
+    var re = /<command\b[^>]*\bname="([^"]+)"/g;
+    var m;
+    while ((m = re.exec(String(xml || "")))) {
+      if (/[^\x00-\x7F]/.test(m[1]) && !names[m[1]]) {
+        names[m[1]] = true;
+        out.push(m[1]);
+      }
+    }
+    return out;
+  }
+  function downloadGGB() {
+    if (!api) return;
+    var wasPlaying = playing;
+    var info = exportTargetInfo();
+    log("Preparing " + info.label + " for " + info.target + ".", "info");
+    log("Support note: " + info.note + ".", "info");
+    showStatus(true);
+    if (!built.ok) {
+      log("Blocked .ggb download because the current preview build has failed commands.", "err");
+      if (wasPlaying) startPlay();
+      return;
+    }
+    var xml = "";
+    try { xml = api.getXML(); } catch (e) {}
+    var localized = localizedCommandNames(xml);
+    if (localized.length) {
+      log("Blocked .ggb download because the GeoGebra XML contains localized command names: " + localized.join(", "), "err");
+      if (wasPlaying) startPlay();
+      return;
+    }
+    var cjk = cjkSnippets(xml);
+    if (cjk.length) {
+      log("Blocked .ggb download because the GeoGebra XML still contains CJK text:", "err");
+      cjk.forEach(function (s) { log("  - " + s, "err"); });
+      showStatus(true);
+      if (wasPlaying) startPlay();
+      return;
+    }
+    var desktopIssues = xmlDesktopCommandIssues(xml);
+    if (desktopIssues.length) {
+      log("Blocked Classic 6 .ggb download because the XML contains unstable geometry command inputs:", "err");
+      desktopIssues.forEach(function (s) { log("  - " + s, "err"); });
+      showStatus(true);
+      if (wasPlaying) startPlay();
+      return;
+    }
+    window.__getGGBBase64().then(function (b64) {
+      return window.__freshLoadGGBBase64(b64, definedObjectNames(), info.appName).then(function (fresh) {
+        if (!fresh || !fresh.ok) {
+          log("Blocked .ggb download because fresh-open verification failed.", "err");
+          if (fresh && fresh.missing && fresh.missing.length) log("Missing objects: " + fresh.missing.join(", "), "err");
+          if (fresh && fresh.dialogText) log(fresh.dialogText, "err");
+          showStatus(true);
+          if (wasPlaying) startPlay();
+          return;
+        }
+        download(safeName() + ".ggb", ggbBase64ToBlob(b64));
+        log("Exported " + safeName() + ".ggb.", "ok");
+        log("Use with: " + info.target + ". Desktop builds may require pressing Play.", "ok");
+        showStatus(true);
+        if (wasPlaying) startPlay();
+      });
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).then(function () { return true; }).catch(function () {
+        return fallbackCopyText(text);
+      });
+    }
+    return fallbackCopyText(text);
+  }
+  function fallbackCopyText(text) {
+    return new Promise(function (resolve, reject) {
+      var textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "readonly");
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        if (document.execCommand("copy")) resolve();
+        else reject(new Error("execCommand returned false"));
+      } catch (e) {
+        reject(e);
+      } finally {
+        textarea.remove();
+      }
+    });
+  }
+  function showManualCopy(text) {
+    copyBufferEl.value = text;
+    copyBufferEl.classList.add("show");
+    showStatus(true);
+    setTimeout(function () {
+      copyBufferEl.focus();
+      copyBufferEl.select();
+    }, 0);
+  }
+  function hideManualCopy() {
+    copyBufferEl.classList.remove("show");
+    copyBufferEl.value = "";
+  }
+  function copyCommands() {
+    var text = commandsText();
+    var button = document.getElementById("btn-copy");
+    copyText(text).then(
+      function () {
+        hideManualCopy();
+        pulseButton(button, "✓ Copied");
+        log("Copied " + (scene.objects || []).length + " commands to the clipboard.", "ok");
+        showStatus(true);
+      },
+      function () {
+        pulseButton(button, "Select Commands");
+        log("Clipboard access was blocked. The commands are selected below; press Cmd+C or Ctrl+C.", "err");
+        showManualCopy(text);
+      }
+    );
+  }
+  function downloadScript() {
+    var header = "# GeoGebra command script · " + (scene.title || "") + "\n" +
+                 "# Usage: paste these commands into the GeoGebra input bar, then press Play if needed.\n";
+    download(safeName() + ".script.txt", new Blob([header + commandsText() + "\n"], { type: "text/plain" }));
+    log("Exported " + safeName() + ".script.txt", "ok");
+    showStatus(true);
+  }
+
+  // ------------------------------------------------------------------ UI wiring
+  function enableButtons(on) {
+    ["btn-play", "btn-reset", "btn-ggb", "btn-copy", "btn-script"].forEach(function (id) {
+      document.getElementById(id).disabled = !on;
+    });
+  }
+  document.getElementById("btn-play").onclick = togglePlay;
+  document.getElementById("btn-reset").onclick = resetClock;
+  document.getElementById("btn-ggb").onclick = downloadGGB;
+  document.getElementById("btn-copy").onclick = copyCommands;
+  document.getElementById("btn-script").onclick = downloadScript;
+  document.getElementById("btn-log").onclick = function () { showStatus(); };
+
+  window.addEventListener("resize", function () {
+    if (api && api.setSize) {
+      var host = document.getElementById("ggb");
+      try { api.setSize(host.clientWidth, host.clientHeight); } catch (e) {}
+    }
+  });
+
+  boot();
+  </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "geogebra-animation-skill",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Turn natural language into GeoGebra animations with browser preview, .ggb export, and command scripts",
+  "bin": {
+    "ggb-anim": "bin/ggb-anim.mjs"
+  },
+  "scripts": {
+    "check": "node bin/ggb-anim.mjs check examples/01-geometry-triangle-orbit",
+    "examples": "node bin/ggb-anim.mjs examples",
+    "preview": "node bin/ggb-anim.mjs preview examples/01-geometry-triangle-orbit"
+  },
+  "devDependencies": {
+    "playwright": "^1.61.1"
+  }
+}

@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GeoGebra Examples Gallery</title>
+<script>
+  (function () {
+    var saved = "";
+    try { saved = localStorage.getItem("ggbAnimationStyle") || ""; } catch (e) {}
+    document.documentElement.dataset.animationStyle = saved === "dark" || saved === "light" ? saved : "light";
+  })();
+</script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    color: #20242a;
+    background: #f5f7fb;
+  }
+  main {
+    width: min(1180px, calc(100vw - 24px));
+    height: 100vh;
+    margin: 0 auto;
+    padding: 12px 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  header { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin-bottom: 10px; }
+  h1 { margin: 0; font-size: 24px; line-height: 1.15; font-weight: 750; }
+  header p { margin: 3px 0 0; color: #667085; }
+  .controls { display: flex; align-items: center; gap: 10px; }
+  .count { color: #667085; font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .style-toggle {
+    display: inline-grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid #d8dee8;
+    border-radius: 8px;
+    background: #ffffff;
+  }
+  .style-toggle button {
+    min-width: 72px;
+    padding: 4px 9px;
+    border: 0;
+    border-radius: 6px;
+    color: #667085;
+    background: transparent;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .style-toggle button[aria-pressed="true"] {
+    color: #ffffff;
+    background: #20242a;
+    font-weight: 700;
+  }
+  ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    min-height: 0;
+    flex: 1;
+    margin: 0;
+    padding: 0;
+  }
+  li { min-height: 0; }
+  .card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    border: 1px solid #d8dee8;
+    border-radius: 8px;
+    color: inherit;
+    background: #ffffff;
+    text-decoration: none;
+    box-shadow: 0 10px 28px rgb(27 31 36 / 7%);
+  }
+  .card:hover { border-color: #2f6fed; box-shadow: 0 14px 36px rgb(27 31 36 / 12%); }
+  .frame { flex: 1 1 auto; min-height: 0; border-bottom: 1px solid #d8dee8; background: #eef2f7; }
+  iframe { display: block; width: 100%; height: 100%; border: 0; pointer-events: none; }
+  .meta { flex: 0 0 auto; padding: 10px 12px 11px; }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+  .badge {
+    flex: 0 0 auto;
+    padding: 2px 8px;
+    border-radius: 999px;
+    color: #174ea6;
+    background: #e8f0fe;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .path {
+    overflow: hidden;
+    color: #667085;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  h2 { margin: 0 0 3px; font-size: 16px; line-height: 1.2; }
+  .meta p {
+    overflow: hidden;
+    margin: 0 0 8px;
+    color: #475467;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .detail { color: #2f6fed; font-weight: 700; }
+  @media (max-width: 760px) {
+    main { height: auto; min-height: 100vh; overflow: visible; }
+    header { display: block; }
+    .controls { justify-content: space-between; margin-top: 8px; }
+    .count { display: block; }
+    ul { grid-template-columns: 1fr; grid-template-rows: none; }
+    .frame { height: 220px; flex: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>GeoGebra Examples Gallery</h1>
+      <p>Four advanced animation examples: geometry, algebra, statistics, and calculus.</p>
+    </div>
+    <div class="controls">
+      <div class="style-toggle" role="group" aria-label="Animation color style">
+        <button type="button" data-animation-style-choice="light">Light Animation</button><button type="button" data-animation-style-choice="dark">Dark Animation</button>
+      </div>
+      <span class="count">4 previews</span>
+    </div>
+  </header>
+  <ul>
+    <li>
+      <a class="card" href="./01-geometry-triangle-orbit/preview.html?style=light" data-preview-href="./01-geometry-triangle-orbit/preview.html" aria-label="Open geometry-triangle-orbit details">
+        <div class="frame">
+          <iframe src="./01-geometry-triangle-orbit/preview.html?embed=1&style=light" data-preview-frame="./01-geometry-triangle-orbit/preview.html" title="geometry-triangle-orbit preview"></iframe>
+        </div>
+        <div class="meta">
+          <div class="row">
+            <span class="badge">Geometry</span>
+            <span class="path">01-geometry-triangle-orbit/scene.json</span>
+          </div>
+          <h2>geometry-triangle-orbit</h2>
+          <p>Geometry example: triangle vertices move on phase-shifted orbits while the circumcircle, medians, and centroid update together</p>
+          <span class="detail">Open Details</span>
+        </div>
+      </a>
+    </li>
+    <li>
+      <a class="card" href="./02-algebra-cubic-roots/preview.html?style=light" data-preview-href="./02-algebra-cubic-roots/preview.html" aria-label="Open algebra-cubic-roots details">
+        <div class="frame">
+          <iframe src="./02-algebra-cubic-roots/preview.html?embed=1&style=light" data-preview-frame="./02-algebra-cubic-roots/preview.html" title="algebra-cubic-roots preview"></iframe>
+        </div>
+        <div class="meta">
+          <div class="row">
+            <span class="badge">Algebra</span>
+            <span class="path">02-algebra-cubic-roots/scene.json</span>
+          </div>
+          <h2>algebra-cubic-roots</h2>
+          <p>Algebra example: two roots of a cubic move with t while the third root stays fixed at -2</p>
+          <span class="detail">Open Details</span>
+        </div>
+      </a>
+    </li>
+    <li>
+      <a class="card" href="./03-statistics-moving-distribution/preview.html?style=light" data-preview-href="./03-statistics-moving-distribution/preview.html" aria-label="Open statistics-moving-distribution details">
+        <div class="frame">
+          <iframe src="./03-statistics-moving-distribution/preview.html?embed=1&style=light" data-preview-frame="./03-statistics-moving-distribution/preview.html" title="statistics-moving-distribution preview"></iframe>
+        </div>
+        <div class="meta">
+          <div class="row">
+            <span class="badge">Statistics</span>
+            <span class="path">03-statistics-moving-distribution/scene.json</span>
+          </div>
+          <h2>statistics-moving-distribution</h2>
+          <p>Statistics example: six grouped frequencies change periodically while the weighted mean mu and standard deviation sigma are recomputed live</p>
+          <span class="detail">Open Details</span>
+        </div>
+      </a>
+    </li>
+    <li>
+      <a class="card" href="./04-calculus-tangent-integral/preview.html?style=light" data-preview-href="./04-calculus-tangent-integral/preview.html" aria-label="Open calculus-tangent-integral details">
+        <div class="frame">
+          <iframe src="./04-calculus-tangent-integral/preview.html?embed=1&style=light" data-preview-frame="./04-calculus-tangent-integral/preview.html" title="calculus-tangent-integral preview"></iframe>
+        </div>
+        <div class="meta">
+          <div class="row">
+            <span class="badge">Calculus</span>
+            <span class="path">04-calculus-tangent-integral/scene.json</span>
+          </div>
+          <h2>calculus-tangent-integral</h2>
+          <p>Calculus example: point P moves along the function curve and the tangent is driven by derivative df(t)</p>
+          <span class="detail">Open Details</span>
+        </div>
+      </a>
+    </li>
+  </ul>
+</main>
+<script>
+  (function () {
+    var root = document.documentElement;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll("[data-animation-style-choice]"));
+    var cards = Array.prototype.slice.call(document.querySelectorAll("[data-preview-href]"));
+    var frames = Array.prototype.slice.call(document.querySelectorAll("[data-preview-frame]"));
+    function apply(style) {
+      if (style !== "dark" && style !== "light") style = "light";
+      root.dataset.animationStyle = style;
+      buttons.forEach(function (button) {
+        button.setAttribute("aria-pressed", button.dataset.animationStyleChoice === style ? "true" : "false");
+      });
+      cards.forEach(function (card) {
+        card.href = card.dataset.previewHref + "?style=" + encodeURIComponent(style);
+      });
+      frames.forEach(function (frame) {
+        frame.src = frame.dataset.previewFrame + "?embed=1&style=" + encodeURIComponent(style);
+      });
+      try { localStorage.setItem("ggbAnimationStyle", style); } catch (e) {}
+    }
+    buttons.forEach(function (button) {
+      button.addEventListener("click", function () { apply(button.dataset.animationStyleChoice); });
+    });
+    apply(root.dataset.animationStyle);
+  })();
+</script>
+</body>
+</html>
