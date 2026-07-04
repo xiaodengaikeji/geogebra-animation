@@ -18,62 +18,133 @@
   :root { color-scheme: light dark; }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; font: 14px/1.5 -apple-system, "Segoe UI", system-ui, sans-serif; }
-  body { display: flex; flex-direction: column; }
+  body { display: flex; flex-direction: column; color: #172033; background: #eef3f8; }
   #bar {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
-    padding: 8px 12px; border-bottom: 1px solid #8884; background: Canvas;
+    display: grid; grid-template-columns: minmax(160px, 1fr) auto auto; gap: 8px 10px;
+    align-items: center; padding: 12px 14px; border-bottom: 1px solid #222a35;
+    color: #f6f8fb; background: #101316; box-shadow: 0 8px 24px rgb(0 0 0 / 18%);
   }
-  #bar .title { font-weight: 600; margin-right: 8px; }
-  #bar .spacer { flex: 1; }
+  #bar .title {
+    min-width: 0; overflow: hidden; font-size: 17px; font-weight: 720;
+    letter-spacing: 0; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .bar-playback, .bar-actions { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; }
+  .bar-actions { justify-content: flex-end; justify-self: end; }
+  .bar-playback { justify-content: flex-end; }
+  .bar-playback { justify-self: end; }
   button {
-    font: inherit; padding: 6px 12px; border: 1px solid #8886; border-radius: 8px;
-    background: #8881; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    min-width: 0; min-height: 38px; font: inherit; font-weight: 650; padding: 7px 13px;
+    border: 1px solid #3b424d; border-radius: 8px; color: #f6f8fb;
+    background: #171b20; cursor: pointer; white-space: nowrap;
   }
-  button:hover { background: #8883; }
-  button.primary { background: #1e88e5; color: #fff; border-color: #1e88e5; }
+  .btn-icon { flex: 0 0 auto; font-size: 15px; line-height: 1; }
+  .btn-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  button:hover { border-color: #5b6472; background: #20262d; }
+  button.primary { background: #2388e8; color: #fff; border-color: #2388e8; box-shadow: 0 8px 18px rgb(35 136 232 / 28%); }
+  button.primary:hover { background: #197bd4; border-color: #197bd4; }
   button.active { border-color: #8ab4f8; box-shadow: 0 0 0 2px rgb(138 180 248 / 28%); }
   button:disabled { opacity: .5; cursor: default; }
-  #ggb { flex: 1; min-height: 0; background: #fbfcfe; }
+  button[hidden] { display: none; }
+  #ggb { flex: 1 1 0; width: 100%; min-width: 0; min-height: 0; overflow: hidden; background: #fbfcfe; }
   html[data-animation-style="dark"] body { color: #e6edf7; background: #0b1020; }
   html[data-animation-style="dark"] #bar,
-  html[data-animation-style="dark"] #status,
-  html[data-animation-style="dark"] #copy-buffer { border-color: #253149; background: #111827; }
+  html[data-animation-style="dark"] #status { border-color: #253149; background: #101316; }
   html[data-animation-style="dark"] #ggb { background: #0b1020; }
   #status {
     font: 12px/1.5 ui-monospace, Menlo, Consolas, monospace;
-    max-height: 30vh; overflow: auto; padding: 10px 12px; border-top: 1px solid #8884;
-    white-space: pre-wrap; display: none; background: Canvas;
+    max-height: 30vh; overflow: auto; padding: 10px 12px; border-top: 1px solid #d7dee8;
+    white-space: pre-wrap; display: none; color: #1f2937; background: #ffffff;
   }
   #status.show { display: block; min-height: 120px; }
   #status .ok { color: #2e7d32; }
   #status .err { color: #c62828; font-weight: 600; }
   #status .info { opacity: .8; }
-  #copy-buffer {
-    display: none; width: 100%; min-height: 110px; max-height: 24vh; resize: vertical;
-    padding: 10px 12px; border: 0; border-top: 1px solid #8884; outline: none;
-    font: 12px/1.5 ui-monospace, Menlo, Consolas, monospace;
-    color: inherit; background: Canvas; white-space: pre;
+  #script-modal[hidden] { display: none; }
+  #script-modal {
+    position: fixed; inset: 0; z-index: 20; display: grid; place-items: center;
+    padding: 18px; background: rgb(7 10 16 / 58%);
   }
-  #copy-buffer.show { display: block; }
+  .modal-panel {
+    display: grid; grid-template-rows: auto minmax(220px, 1fr) auto; gap: 12px;
+    width: min(920px, 100%); max-height: min(720px, calc(100vh - 36px));
+    padding: 14px; border: 1px solid #d7dee8; border-radius: 8px; background: #f8fafc; color: #1f2937;
+    box-shadow: 0 28px 86px rgb(0 0 0 / 36%);
+  }
+  .modal-head, .modal-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .modal-head h2 { margin: 0; font-size: 16px; line-height: 1.25; letter-spacing: 0; }
+  .script-meta { color: #667085; font: 12px/1.4 ui-monospace, Menlo, Consolas, monospace; }
+  #script-text {
+    width: 100%; min-height: 0; margin: 0; overflow: auto; user-select: text;
+    padding: 12px 14px; border: 1px solid #d7dee8; border-radius: 8px;
+    color: #dbeafe; background: #101827; font: 12px/1.55 ui-monospace, Menlo, Consolas, monospace; white-space: pre;
+  }
+  #script-text code { display: block; min-width: max-content; }
+  .tok-comment { color: #8ea0b8; }
+  .tok-label { color: #fcd34d; }
+  .tok-command { color: #7dd3fc; }
+  .tok-string { color: #86efac; }
+  .tok-bool { color: #f9a8d4; }
+  html[data-animation-style="dark"] #status { border-color: #253149; color: #dbeafe; background: #101316; }
+  html[data-animation-style="dark"] .modal-panel { border-color: #2f3a4c; background: #111827; color: #e6edf7; }
+  html[data-animation-style="dark"] .script-meta { color: #aebbd2; }
+  @media (max-width: 860px) {
+    #bar { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; padding: 8px; }
+    #bar:has(#btn-log:not([hidden])) { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    #bar .title { grid-column: 1 / -1; }
+    .bar-actions, .bar-playback { display: contents; }
+    #bar button { width: 100%; min-height: 40px; padding-inline: 8px; overflow: hidden; text-overflow: ellipsis; }
+    #bar .btn-label { display: none; }
+    #bar .btn-icon { font-size: 16px; }
+    .modal-actions { align-items: stretch; flex-direction: column; }
+    .modal-actions button { width: 100%; }
+  }
   .embed body { overflow: hidden; }
-  .embed #bar, .embed #status, .embed #copy-buffer { display: none !important; }
+  .embed #bar, .embed #status, .embed #script-modal { display: none !important; }
   .embed #ggb { height: 100vh; }
 </style>
 </head>
 <body>
   <div id="bar">
     <span class="title" id="title">GeoGebra Animation</span>
-    <button id="btn-play" class="primary" disabled>▶︎ Play</button>
-    <button id="btn-reset" disabled>↺ Reset</button>
-    <span class="spacer"></span>
-    <button id="btn-ggb" disabled title="For GeoGebra Classic 6">⬇ Classic 6 .ggb</button>
-    <button id="btn-copy" disabled>⧉ Copy Commands</button>
-    <button id="btn-script" disabled>⬇ script.txt</button>
-    <button id="btn-log">Log</button>
+    <div class="bar-actions">
+      <button id="btn-ggb" disabled title="Download Classic 6 .ggb" aria-label="Download Classic 6 .ggb">
+        <span class="btn-icon" aria-hidden="true">⬇</span><span class="btn-label">Classic 6 .ggb</span>
+      </button>
+      <button id="btn-view-script" disabled title="Show command script" aria-label="Show command script">
+        <span class="btn-icon" aria-hidden="true">⧉</span><span class="btn-label">Script</span>
+      </button>
+    </div>
+    <div class="bar-playback">
+      <button id="btn-play" class="primary" disabled title="Play animation" aria-label="Play animation">
+        <span class="btn-icon" aria-hidden="true">▶︎</span><span class="btn-label">Play</span>
+      </button>
+      <button id="btn-reset" disabled title="Reset animation" aria-label="Reset animation">
+        <span class="btn-icon" aria-hidden="true">↺</span><span class="btn-label">Reset</span>
+      </button>
+      <button id="btn-log" hidden title="Show log" aria-label="Show log">
+        <span class="btn-icon" aria-hidden="true">☰</span><span class="btn-label">Log</span>
+      </button>
+    </div>
   </div>
   <div id="ggb"></div>
   <pre id="status"></pre>
-  <textarea id="copy-buffer" readonly aria-label="Command script copy buffer"></textarea>
+  <div id="script-modal" role="dialog" aria-modal="true" aria-labelledby="script-modal-title" hidden>
+    <div class="modal-panel">
+      <div class="modal-head">
+        <div>
+          <h2 id="script-modal-title">GeoGebra command script</h2>
+          <div class="script-meta" id="script-count">0 commands</div>
+        </div>
+        <button id="btn-close-script" type="button">Close</button>
+      </div>
+      <pre id="script-text" tabindex="0" aria-label="GeoGebra command script"><code></code></pre>
+      <div class="modal-actions">
+        <button id="btn-copy-script" type="button">Copy Script</button>
+        <button id="btn-download-script-modal" type="button">⬇ script.txt</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Official GeoGebra engine. Preview and export use the same engine. -->
   <script>window.__SCENE__ = {"$schema":"geogebra-anim/v1","title":"statistics-moving-distribution","app":"classic","view":{"coords":[-3.6,3.6,-0.4,3.6],"axes":true,"grid":false,"axisRatio":[1,1]},"objects":["t = Slider(0, 2*pi, 0.02, 0.55, 200, false, true, true, false)","x1 = -2.6","x2 = -1.55","x3 = -0.5","x4 = 0.55","x5 = 1.6","x6 = 2.55","h1 = 1.2 + 0.55*sin(t)","h2 = 1.45 + 0.55*sin(t + 0.9)","h3 = 1.75 + 0.65*sin(t + 1.8)","h4 = 1.65 + 0.6*sin(t + 2.7)","h5 = 1.35 + 0.55*sin(t + 3.6)","h6 = 1.1 + 0.5*sin(t + 4.5)","total = h1 + h2 + h3 + h4 + h5 + h6","mu = (x1*h1 + x2*h2 + x3*h3 + x4*h4 + x5*h5 + x6*h6)/total","sigma = sqrt(((x1 - mu)^2*h1 + (x2 - mu)^2*h2 + (x3 - mu)^2*h3 + (x4 - mu)^2*h4 + (x5 - mu)^2*h5 + (x6 - mu)^2*h6)/total)","M = (mu, 0)","MeanTop = (mu, 3.25)","BA1 = (-3.05, 0)","BB1 = (-2.15, 0)","BC1 = (-2.15, h1)","BD1 = (-3.05, h1)","BA2 = (-2.0, 0)","BB2 = (-1.1, 0)","BC2 = (-1.1, h2)","BD2 = (-2.0, h2)","BA3 = (-0.95, 0)","BB3 = (-0.05, 0)","BC3 = (-0.05, h3)","BD3 = (-0.95, h3)","BA4 = (0.1, 0)","BB4 = (1.0, 0)","BC4 = (1.0, h4)","BD4 = (0.1, h4)","BA5 = (1.15, 0)","BB5 = (2.05, 0)","BC5 = (2.05, h5)","BD5 = (1.15, h5)","BA6 = (2.2, 0)","BB6 = (3.1, 0)","BC6 = (3.1, h6)","BD6 = (2.2, h6)","bar1 = Polygon(BA1, BB1, BC1, BD1)","bar2 = Polygon(BA2, BB2, BC2, BD2)","bar3 = Polygon(BA3, BB3, BC3, BD3)","bar4 = Polygon(BA4, BB4, BC4, BD4)","bar5 = Polygon(BA5, BB5, BC5, BD5)","bar6 = Polygon(BA6, BB6, BC6, BD6)","meanLine = Segment(M, MeanTop)","bell = Curve(u, 1.75*exp(-((u - mu)^2)/(2*sigma^2)), u, -3.2, 3.2)","SetVisibleInView(MeanTop, 1, false)","SetVisibleInView(BA1, 1, false)","SetVisibleInView(BB1, 1, false)","SetVisibleInView(BC1, 1, false)","SetVisibleInView(BD1, 1, false)","SetVisibleInView(BA2, 1, false)","SetVisibleInView(BB2, 1, false)","SetVisibleInView(BC2, 1, false)","SetVisibleInView(BD2, 1, false)","SetVisibleInView(BA3, 1, false)","SetVisibleInView(BB3, 1, false)","SetVisibleInView(BC3, 1, false)","SetVisibleInView(BD3, 1, false)","SetVisibleInView(BA4, 1, false)","SetVisibleInView(BB4, 1, false)","SetVisibleInView(BC4, 1, false)","SetVisibleInView(BD4, 1, false)","SetVisibleInView(BA5, 1, false)","SetVisibleInView(BB5, 1, false)","SetVisibleInView(BC5, 1, false)","SetVisibleInView(BD5, 1, false)","SetVisibleInView(BA6, 1, false)","SetVisibleInView(BB6, 1, false)","SetVisibleInView(BC6, 1, false)","SetVisibleInView(BD6, 1, false)","SetColor(bar1, \"#4C78A8\")","SetColor(bar2, \"#72B7B2\")","SetColor(bar3, \"#54A24B\")","SetColor(bar4, \"#F58518\")","SetColor(bar5, \"#E45756\")","SetColor(bar6, \"#B279A2\")","SetFilling(bar1, 0.55)","SetFilling(bar2, 0.55)","SetFilling(bar3, 0.55)","SetFilling(bar4, 0.55)","SetFilling(bar5, 0.55)","SetFilling(bar6, 0.55)","SetColor(meanLine, \"#111827\")","SetLineThickness(meanLine, 4)","SetColor(M, \"#111827\")","SetPointSize(M, 7)","SetTrace(M, true)","SetColor(bell, \"#E45756\")","SetLineThickness(bell, 4)","ShowLabel(x1, false)","ShowLabel(x2, false)","ShowLabel(x3, false)","ShowLabel(x4, false)","ShowLabel(x5, false)","ShowLabel(x6, false)","ShowLabel(h1, false)","ShowLabel(h2, false)","ShowLabel(h3, false)","ShowLabel(h4, false)","ShowLabel(h5, false)","ShowLabel(h6, false)","ShowLabel(total, false)","ShowLabel(mu, false)","ShowLabel(sigma, false)","ShowLabel(M, false)","ShowLabel(MeanTop, false)","ShowLabel(BA1, false)","ShowLabel(BB1, false)","ShowLabel(BC1, false)","ShowLabel(BD1, false)","ShowLabel(BA2, false)","ShowLabel(BB2, false)","ShowLabel(BC2, false)","ShowLabel(BD2, false)","ShowLabel(BA3, false)","ShowLabel(BB3, false)","ShowLabel(BC3, false)","ShowLabel(BD3, false)","ShowLabel(BA4, false)","ShowLabel(BB4, false)","ShowLabel(BC4, false)","ShowLabel(BD4, false)","ShowLabel(BA5, false)","ShowLabel(BB5, false)","ShowLabel(BC5, false)","ShowLabel(BD5, false)","ShowLabel(BA6, false)","ShowLabel(BB6, false)","ShowLabel(BC6, false)","ShowLabel(BD6, false)","ShowLabel(bar1, false)","ShowLabel(bar2, false)","ShowLabel(bar3, false)","ShowLabel(bar4, false)","ShowLabel(bar5, false)","ShowLabel(bar6, false)","ShowLabel(meanLine, false)","ShowLabel(bell, false)"],"animate":[{"target":"t","speed":0.55,"direction":"increasing"}],"autoplay":true,"captureAt":0,"notes":"Statistics example: six grouped frequencies change periodically while the weighted mean mu and standard deviation sigma are recomputed live. A mean line and bell curve show the changing distribution shape.","exportFormat":"classic"}; window.__ANIMATION_STYLES__ = {"light":{"label":"Light Animation","view":{"background":"#FBFCFE","axes":"#2F3A4C","grid":"#E3EAF2","slider":"#2F3A4C"},"colors":{"#4C78A8":"#3B6FD8","#1F77B4":"#0B79B7","#72B7B2":"#0E8F87","#54A24B":"#2F9B63","#F58518":"#E78A00","#E45756":"#D84A5F","#B279A2":"#7A5CCF","#9D755D":"#6B7280","#111827":"#111827"},"fillings":{"0.18":"0.20","0.35":"0.32","0.55":"0.50"}},"dark":{"label":"Dark Animation","view":{"background":"#0B1020","axes":"#AEBBD2","grid":"#253149","slider":"#E6EDF7"},"colors":{"#4C78A8":"#86A8FF","#1F77B4":"#38BDF8","#72B7B2":"#52D6C5","#54A24B":"#8BE8B0","#F58518":"#F8C45C","#E45756":"#F47C8E","#B279A2":"#C2B2FF","#9D755D":"#C5D0E0","#111827":"#F5F7FB"},"fillings":{"0.18":"0.30","0.35":"0.36","0.55":"0.48"}}};</script>
@@ -87,12 +158,17 @@
   var captureAt = 0;         // Clock value used before export.
   var built = { ok: false, errors: [], lines: [] };
   var embedded = document.documentElement.classList.contains("embed");
+  var resizeScheduled = false;
+  var lastAppletSize = { width: 0, height: 0 };
 
   var statusEl = document.getElementById("status");
-  var copyBufferEl = document.getElementById("copy-buffer");
   var logLines = [];
+  var logButtonEnabled = false;
   function log(msg, cls) {
-    logLines.push({ msg: msg, cls: cls || "info" });
+    cls = cls || "info";
+    logLines.push({ msg: msg, cls: cls });
+    if (cls === "err") logButtonEnabled = true;
+    syncLogButton();
     render();
   }
   function render() {
@@ -103,6 +179,9 @@
   }
   function escapeHtml(s) {
     return String(s).replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; });
+  }
+  function stripStringLiterals(s) {
+    return String(s).replace(/"([^"\\]|\\.)*"/g, "\"\"").replace(/'([^'\\]|\\.)*'/g, "''");
   }
   function escapeRegExp(s) { return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
   function cjkSnippets(text) {
@@ -143,19 +222,56 @@
   function definedObjectNames() {
     var names = [];
     (scene.objects || []).forEach(function (o) {
-      var m = cmdOf(o).match(/^\s*([A-Za-z_]\w*)\s*:?=(?!=)/);
+      var m = cmdOf(o).match(/^\s*([A-Za-z_]\w*)\s*(?::=|=(?!=)|:)/);
       if (m) names.push(m[1]);
     });
     return names;
   }
   function showStatus(on) {
+    if (!logLines.length) return;
     var next = typeof on === "boolean" ? on : !statusEl.classList.contains("show");
+    if (next) logButtonEnabled = true;
     statusEl.classList.toggle("show", next);
-    if (!next) copyBufferEl.classList.remove("show");
     var button = document.getElementById("btn-log");
     button.classList.toggle("active", next);
     button.setAttribute("aria-pressed", next ? "true" : "false");
+    syncLogButton();
     render();
+  }
+  function syncLogButton() {
+    var button = document.getElementById("btn-log");
+    if (!button) return;
+    button.hidden = !logButtonEnabled;
+  }
+  function topLevelArgs(raw) {
+    var args = [];
+    var depth = 0;
+    var start = 0;
+    var s = String(raw || "");
+    for (var i = 0; i < s.length; i++) {
+      var ch = s.charAt(i);
+      if (ch === "(" || ch === "[" || ch === "{") depth++;
+      else if (ch === ")" || ch === "]" || ch === "}") depth = Math.max(0, depth - 1);
+      else if (ch === "," && depth === 0) {
+        args.push(s.slice(start, i).trim());
+        start = i + 1;
+      }
+    }
+    var tail = s.slice(start).trim();
+    if (tail) args.push(tail);
+    return args;
+  }
+  function expressionWrapperIssue(cmd, index) {
+    var m = String(cmd || "").match(/^\s*(?:[A-Za-z_]\w*(?:\([^)]*\))?\s*(?::=|=(?!=)|:)\s*)?([A-Z][A-Za-z0-9_]*)\s*\(([\s\S]*)\)\s*$/);
+    if (!m) return null;
+    var args = topLevelArgs(m[2]);
+    if (args.length !== 1) return null;
+    var arg = stripStringLiterals(args[0]);
+    var hasFreeXY = /(^|[^A-Za-z0-9_])x([^A-Za-z0-9_]|$)/.test(arg) || /(^|[^A-Za-z0-9_])y([^A-Za-z0-9_]|$)/.test(arg);
+    var hasAlgebra = /[=+\-*/^]/.test(arg);
+    var looksLikePoint = /^\s*\([^,]+,[^,]+\)\s*$/.test(arg);
+    if (!hasFreeXY || !hasAlgebra || looksLikePoint) return null;
+    return "objects[" + index + "] wraps a single algebraic x/y expression in " + m[1] + "(...). Use a direct equation label, function definition, or Curve(...), unless references/commands.md documents this exact command signature.";
   }
   function pulseButton(button, text) {
     var old = button.textContent;
@@ -166,10 +282,49 @@
       button.classList.remove("active");
     }, 1400);
   }
+  function setToolbarButton(id, icon, label, title) {
+    var button = document.getElementById(id);
+    if (!button) return;
+    var iconEl = button.querySelector(".btn-icon");
+    var labelEl = button.querySelector(".btn-label");
+    if (iconEl) iconEl.textContent = icon;
+    if (labelEl) labelEl.textContent = label;
+    button.setAttribute("aria-label", title || label);
+    button.title = title || label;
+  }
 
   // Extract the command string. objects accepts "cmd" or {cmd, expect}.
   function cmdOf(o) { return typeof o === "string" ? o : (o && o.cmd) || ""; }
   function commandsText() { return (scene.objects || []).map(cmdOf).join("\n"); }
+  function scriptText() {
+    return "# GeoGebra command script · " + (scene.title || "") + "\n" +
+      "# Usage: paste these commands into the GeoGebra input bar, then press Play if needed.\n" +
+      commandsText() + "\n";
+  }
+  function highlightScriptChunk(chunk) {
+    return chunk
+      .replace(/^(\s*[A-Za-z_]\w*(?:\([^)]*\))?\s*(?::=|=(?!=)|:))/, '<span class="tok-label">$1</span>')
+      .replace(/\b([A-Z][A-Za-z0-9_]*)\s*(?=\()/g, '<span class="tok-command">$1</span>')
+      .replace(/\b(true|false|pi)\b/g, '<span class="tok-bool">$1</span>');
+  }
+  function highlightScriptLine(line) {
+    if (/^\s*#/.test(line)) return '<span class="tok-comment">' + escapeHtml(line) + "</span>";
+    var escaped = escapeHtml(line);
+    var out = "";
+    var last = 0;
+    var re = /"[^"]*"/g;
+    var m;
+    while ((m = re.exec(escaped))) {
+      out += highlightScriptChunk(escaped.slice(last, m.index));
+      out += '<span class="tok-string">' + m[0] + "</span>";
+      last = m.index + m[0].length;
+    }
+    out += highlightScriptChunk(escaped.slice(last));
+    return out;
+  }
+  function highlightedScriptHtml(text) {
+    return String(text || "").split("\n").map(highlightScriptLine).join("\n");
+  }
   function safeName() { return (scene.title || "geogebra-animation").replace(/[^\w.\-]+/g, "-"); }
   function selectedAnimationStyle() {
     var name = "";
@@ -219,7 +374,7 @@
     var names = [];
     var seen = {};
     (objects || []).forEach(function (o) {
-      var m = cmdOf(o).match(/^\s*([A-Za-z_]\w*)\s*:?=(?!=)/);
+      var m = cmdOf(o).match(/^\s*([A-Za-z_]\w*)\s*(?::=|=(?!=)|:)/);
       if (m && !seen[m[1]]) {
         seen[m[1]] = true;
         names.push(m[1]);
@@ -299,18 +454,19 @@
   function boot() {
     if (typeof GGBApplet === "undefined") {
       log("Failed to load deployggb.js. Check the network or use the offline GeoGebra Math Apps Bundle.", "err");
-      statusEl.classList.add("show");
+      showStatus(true);
       return;
     }
     loadScene().then(function (s) { inject(prepareClassic6Scene(applyAnimationStyle(s))); }).catch(function (e) {
       log("Failed to load scene: " + e.message, "err");
-      statusEl.classList.add("show");
+      showStatus(true);
     });
   }
 
   function inject(s) {
     scene = s;
     document.getElementById("title").textContent = scene.title || "GeoGebra Animation";
+    document.getElementById("title").title = scene.title || "GeoGebra Animation";
     document.title = (scene.title || "GeoGebra") + " · Preview";
     var host = document.getElementById("ggb");
     var params = {
@@ -353,6 +509,7 @@
 
     // Ready. The following window.* hooks are used by headless check/export.
     enableButtons(true);
+    scheduleAppletResize(true);
     window.__BUILD__ = built;          // Build result: { ok, errors, lines }
     window.__CLOCK__ = clock;          // Main clock slider name.
     window.__CAPTURE_AT__ = captureAt; // Export frame value.
@@ -439,7 +596,7 @@
     if (scene.autoplay !== false && clock) { startPlay(); }
 
     log(built.ok ? "Build complete. All commands passed." : "Build complete, but at least one command failed.", built.ok ? "ok" : "err");
-    if (!built.ok) statusEl.classList.add("show");
+    if (!built.ok) showStatus(true);
   }
 
   function applyView(v) {
@@ -472,7 +629,7 @@
   //  script  (SetColor, SetTrace)  -> false return still counts as success
   //  create  (bare command)        -> trust evalCommand return
   function classify(cmd) {
-    var mAssign = cmd.match(/^\s*([A-Za-z_]\w*)\s*(?:\([^)]*\))?\s*:?=(?!=)/);
+    var mAssign = cmd.match(/^\s*([A-Za-z_]\w*)\s*(?:\([^)]*\))?\s*(?::=|=(?!=)|:)/);
     if (mAssign) return { kind: "assign", name: mAssign[1] };
     var mHead = cmd.match(/^\s*([A-Za-z]\w*)\s*\(/);
     if (mHead && SCRIPTING[mHead[1]]) return { kind: "script" };
@@ -484,6 +641,14 @@
     for (var i = 0; i < objs.length; i++) {
       var cmd = cmdOf(objs[i]);
       if (!cmd.trim()) continue;
+      var sourceIssue = expressionWrapperIssue(cmd, i);
+      if (sourceIssue) {
+        built.ok = false;
+        built.errors.push({ i: i, cmd: cmd, reason: sourceIssue });
+        log("[" + (i + 1) + "] ✗ " + sourceIssue, "err");
+        log("  -> Prefer verified direct definitions over guessed wrapper commands for algebraic objects.", "info");
+        break;
+      }
       var ret = false;
       try { ret = api.evalCommand(cmd); } catch (e) { ret = false; }
       var cls = classify(cmd);
@@ -495,7 +660,7 @@
         built.ok = false;
         built.errors.push({ i: i, cmd: cmd });
         log("[" + (i + 1) + "] ✗ Command failed: " + cmd, "err");
-        log("  -> Check English command names, explicit *, dependency order, and whether the selected app supports this command.", "info");
+        log("  -> Check English command names, explicit *, dependency order, documented command signatures, and whether the selected app supports this command.", "info");
         break; // Stop at the first real failure because later commands usually depend on it.
       }
     }
@@ -557,8 +722,7 @@
   function stopPlay() { try { api.stopAnimation(); playing = false; syncPlayBtn(); } catch (e) {} }
   function togglePlay() { playing ? stopPlay() : startPlay(); }
   function syncPlayBtn() {
-    var b = document.getElementById("btn-play");
-    b.textContent = playing ? "⏸ Pause" : "▶︎ Play";
+    setToolbarButton("btn-play", playing ? "⏸" : "▶︎", playing ? "Pause" : "Play", playing ? "Pause animation" : "Play animation");
   }
   function resetClock() {
     stopPlay();
@@ -677,63 +841,104 @@
       }
     });
   }
-  function showManualCopy(text) {
-    copyBufferEl.value = text;
-    copyBufferEl.classList.add("show");
-    showStatus(true);
-    setTimeout(function () {
-      copyBufferEl.focus();
-      copyBufferEl.select();
-    }, 0);
-  }
-  function hideManualCopy() {
-    copyBufferEl.classList.remove("show");
-    copyBufferEl.value = "";
-  }
-  function copyCommands() {
-    var text = commandsText();
-    var button = document.getElementById("btn-copy");
-    copyText(text).then(
-      function () {
-        hideManualCopy();
-        pulseButton(button, "✓ Copied");
-        log("Copied " + (scene.objects || []).length + " commands to the clipboard.", "ok");
-        showStatus(true);
-      },
-      function () {
-        pulseButton(button, "Select Commands");
-        log("Clipboard access was blocked. The commands are selected below; press Cmd+C or Ctrl+C.", "err");
-        showManualCopy(text);
-      }
-    );
-  }
   function downloadScript() {
-    var header = "# GeoGebra command script · " + (scene.title || "") + "\n" +
-                 "# Usage: paste these commands into the GeoGebra input bar, then press Play if needed.\n";
-    download(safeName() + ".script.txt", new Blob([header + commandsText() + "\n"], { type: "text/plain" }));
+    download(safeName() + ".script.txt", new Blob([scriptText()], { type: "text/plain" }));
     log("Exported " + safeName() + ".script.txt", "ok");
     showStatus(true);
+  }
+  function openScriptModal() {
+    var modal = document.getElementById("script-modal");
+    var code = document.querySelector("#script-text code");
+    code.innerHTML = highlightedScriptHtml(scriptText());
+    document.getElementById("script-count").textContent = (scene.objects || []).length + " commands";
+    modal.hidden = false;
+    setTimeout(function () { document.getElementById("script-text").focus(); }, 0);
+  }
+  function closeScriptModal() {
+    document.getElementById("script-modal").hidden = true;
+  }
+  function selectScriptCode() {
+    var code = document.querySelector("#script-text code");
+    var selection = window.getSelection();
+    var range = document.createRange();
+    range.selectNodeContents(code);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    document.getElementById("script-text").focus();
+  }
+  function copyScriptFromModal() {
+    var button = document.getElementById("btn-copy-script");
+    copyText(scriptText()).then(
+      function () { pulseButton(button, "✓ Copied"); },
+      function () {
+        selectScriptCode();
+        pulseButton(button, "Select Script");
+      }
+    );
   }
 
   // ------------------------------------------------------------------ UI wiring
   function enableButtons(on) {
-    ["btn-play", "btn-reset", "btn-ggb", "btn-copy", "btn-script"].forEach(function (id) {
+    ["btn-play", "btn-reset", "btn-ggb", "btn-view-script"].forEach(function (id) {
       document.getElementById(id).disabled = !on;
     });
   }
   document.getElementById("btn-play").onclick = togglePlay;
   document.getElementById("btn-reset").onclick = resetClock;
   document.getElementById("btn-ggb").onclick = downloadGGB;
-  document.getElementById("btn-copy").onclick = copyCommands;
-  document.getElementById("btn-script").onclick = downloadScript;
+  document.getElementById("btn-view-script").onclick = openScriptModal;
+  document.getElementById("btn-close-script").onclick = closeScriptModal;
+  document.getElementById("btn-copy-script").onclick = copyScriptFromModal;
+  document.getElementById("btn-download-script-modal").onclick = downloadScript;
   document.getElementById("btn-log").onclick = function () { showStatus(); };
-
-  window.addEventListener("resize", function () {
-    if (api && api.setSize) {
-      var host = document.getElementById("ggb");
-      try { api.setSize(host.clientWidth, host.clientHeight); } catch (e) {}
-    }
+  document.getElementById("script-modal").onclick = function (event) {
+    if (event.target.id === "script-modal") closeScriptModal();
+  };
+  window.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") closeScriptModal();
   });
+
+  function resizeApplet(force) {
+    if (!api || !api.setSize) return;
+    var host = document.getElementById("ggb");
+    host.style.width = "100%";
+    host.style.maxWidth = "none";
+    var rect = host.getBoundingClientRect();
+    var viewportWidth = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    var width = Math.max(1, Math.round(Math.max(rect.width, host.clientWidth || 0, viewportWidth)));
+    var height = Math.max(1, Math.round(rect.height));
+    if (!force && width === lastAppletSize.width && height === lastAppletSize.height) return;
+    lastAppletSize = { width: width, height: height };
+    try { api.setSize(width, height); } catch (e) {}
+    syncAppletDomSize(width, height);
+    try {
+      applyView(scene.view || {});
+      applyAnimationViewStyle(scene.animationStyle);
+    } catch (e) {}
+  }
+  function syncAppletDomSize(width, height) {
+    var host = document.getElementById("ggb");
+    var nodes = host.querySelectorAll(".applet_scaler, #ggbApplet, .GeoGebraFrame");
+    for (var i = 0; i < nodes.length; i++) {
+      nodes[i].style.width = width + "px";
+      nodes[i].style.height = height + "px";
+      nodes[i].style.maxWidth = "none";
+    }
+  }
+  function scheduleAppletResize(force) {
+    if (resizeScheduled) return;
+    resizeScheduled = true;
+    requestAnimationFrame(function () {
+      resizeScheduled = false;
+      resizeApplet(!!force);
+      setTimeout(function () { resizeApplet(true); }, 120);
+    });
+  }
+  window.addEventListener("resize", function () { scheduleAppletResize(true); });
+  if (window.visualViewport) window.visualViewport.addEventListener("resize", function () { scheduleAppletResize(true); });
+  if (window.ResizeObserver) {
+    new ResizeObserver(function () { scheduleAppletResize(false); }).observe(document.getElementById("ggb"));
+  }
 
   boot();
   </script>

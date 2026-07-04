@@ -43,7 +43,8 @@ For the examples gallery, run `node bin/ggb-anim.mjs examples`, then use the `Li
 5. Style should be separate commands after the object, such as `SetColor(P, "#1E88E5")`. Use hex colors or 0-1 RGB values, never 0-255 values in GeoGebra commands.
 6. Use one clock slider. Define other objects as functions of that slider. Bake animation into `Slider(...)` by setting the eighth parameter, `animating`, to `true`.
 7. Only claim support for GeoGebra Classic 6. The generated `.ggb` is verified for Classic 6, not for Graphing Calculator, Geometry Calculator, Calculator Suite, Classic 5, mobile apps, or other app families.
-8. Do not invent commands. Check `references/commands.md` or run `check` with the real engine.
+8. Do not invent commands or command signatures. Use only top-level command forms shown in `references/commands.md`, or run `check` with the real engine before relying on a new form.
+9. For algebraic objects, prefer direct definitions over guessed wrapper commands. Use `f(x) = ...`, `C: ... = ...`, named points, or `Curve(...)`. Do not write `Name = CommandName(expression in x/y)` unless `references/commands.md` documents that exact signature.
 
 ## Reference Routing
 

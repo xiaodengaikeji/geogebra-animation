@@ -68,6 +68,7 @@ Rules:
 
 - Command names must be English.
 - Multiplication must use explicit `*`.
+- Prefer direct algebraic definitions (`f(x) = ...`, `C: ... = ...`) and documented constructors. Do not wrap a single free `x`/`y` expression in a guessed command such as `Name = CommandName(expression)`.
 - Any `animate.target` must be defined in `objects` with an assignment such as `t = ...`.
 - Style and trace settings should also be commands in `objects`.
 

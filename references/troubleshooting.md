@@ -5,6 +5,7 @@
 | Symptom | Cause | Fix |
 | --- | --- | --- |
 | `evalCommand` returns false | Localized command name, missing `*`, missing dependency, or unsupported command | Use English names, explicit `*`, and define dependencies first. |
+| `validate` reports an unstable algebraic command pattern | A command wraps one free `x`/`y` expression, which is often a guessed or unsupported signature | Use a direct labeled equation (`C: ... = ...`), a function definition, or `Curve(...)`; only keep wrapper commands when their exact signature is documented and verified. |
 | Circle renders as ellipse | View units are not equal | Set `view.axisRatio` to `[1, 1]`. |
 | Trig result is wrong | Degrees were used as radians | Use radians, `30°`, or `30*pi/180`. |
 | `ax` behaves like a variable | Adjacent letters form one variable name | Write `a*x`. |

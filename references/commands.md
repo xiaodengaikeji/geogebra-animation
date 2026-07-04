@@ -12,6 +12,28 @@ This file lists the commands that are commonly needed by the skill. Use English 
 | `ax` | `a*x` | `ax` is one variable name. |
 | `sin(30)` | `sin(30°)` or `sin(30*pi/180)` | Trig functions use radians. |
 | `SetColor(P,30,136,229)` | `SetColor(P, "#1E88E5")` | Command RGB values are 0-1, not 0-255. |
+| `K = CommandName(x^2/4 + y^2/3 - 1)` | `K: x^2/4 + y^2/3 = 1` or `K = Curve(2*cos(u), sqrt(3)*sin(u), u, 0, 2*pi)` | Do not guess wrapper commands for algebraic expressions. Use direct equations or documented parametric curves. |
+
+## Direct Definitions Before Commands
+
+Use a command only when this reference lists its syntax or `check` has verified it in Classic 6. For algebraic objects, direct definitions are usually more stable than wrapping an expression in a guessed command.
+
+Stable patterns:
+
+```geogebra
+f(x) = 0.12*x^3 - 0.45*x + 1.8
+circleEq: x^2 + y^2 = 4
+ellipseEq: x^2/4 + y^2/3 = 1
+ellipsePath = Curve(2*cos(u), sqrt(3)*sin(u), u, 0, 2*pi)
+```
+
+Avoid this general pattern unless the exact signature is documented:
+
+```geogebra
+Bad:  obj = CommandName(x^2/4 + y^2/3 - 1)
+Good: obj: x^2/4 + y^2/3 = 1
+Good: objPath = Curve(2*cos(u), sqrt(3)*sin(u), u, 0, 2*pi)
+```
 
 ## Sliders
 
@@ -121,6 +143,18 @@ For explicit derivatives, direct formulas are often more reliable:
 f(x) = 0.12*x^3 - 0.45*x + 1.8
 df(x) = 0.36*x^2 - 0.45
 q(x) = f(t) + df(t)*(x - t)
+```
+
+## Algebraic Curves
+
+For implicit algebraic curves, use a direct labeled equation. For animated paths, prefer a parametric `Curve(...)`.
+
+```geogebra
+unitCircle: x^2 + y^2 = 1
+ellipseEq: x^2/a^2 + y^2/b^2 = 1
+hyperbolaEq: x^2/a^2 - y^2/b^2 = 1
+parabolaEq: y^2 = 4*p*x
+ellipsePath = Curve(a*cos(u), b*sin(u), u, 0, 2*pi)
 ```
 
 ## Curves and Loci

@@ -218,7 +218,7 @@ function openInBrowser(file, query = "") {
 function definedNames(objects) {
   const names = new Set();
   for (const o of objects) {
-    const m = cmdOf(o).match(/^\s*([A-Za-z_]\w*)\s*:?=(?!=)/); // name = ...  /  name := ...
+    const m = cmdOf(o).match(/^\s*([A-Za-z_]\w*)\s*(?::=|=(?!=)|:)/); // name = ...  /  name := ...  /  name: equation
     if (m) names.add(m[1]);
   }
   return names;
@@ -227,6 +227,21 @@ function definedNames(objects) {
 const DESKTOP_GEOMETRY_COMMANDS = new Set([
   "Segment", "Polygon", "Line", "Circle", "Ray", "Vector", "Midpoint",
   "PerpendicularLine", "PerpendicularBisector", "ParallelLine", "CircularArc", "CircularSector"
+]);
+
+const DOCUMENTED_TOP_LEVEL_COMMANDS = new Set([
+  "Slider",
+  "Segment", "Polygon", "Line", "Circle", "Ray", "Vector",
+  "Midpoint", "Centroid", "PerpendicularLine", "PerpendicularBisector", "ParallelLine",
+  "CircularArc", "CircularSector",
+  "Area", "Perimeter",
+  "Rotate", "Translate", "Reflect", "Dilate",
+  "Curve", "Locus", "Derivative", "Integral", "Sequence", "If",
+  "SetColor", "SetBackgroundColor", "SetDynamicColor", "SetLabelColor",
+  "SetPointSize", "SetPointStyle", "SetLineThickness", "SetLineStyle", "SetFilling",
+  "SetVisibleInView", "SetLabelMode", "SetCaption", "SetTrace", "SetValue", "SetCoords",
+  "SetConditionToShowObject", "SetLayer", "SetTooltipMode", "SetFixed", "SetSpinSpeed",
+  "SetAxesRatio", "ShowLabel", "StartAnimation", "SelectObjects", "Delete", "Rename", "PlaySound"
 ]);
 
 function topLevelArgs(raw) {
@@ -245,6 +260,45 @@ function topLevelArgs(raw) {
   const tail = s.slice(start).trim();
   if (tail) args.push(tail);
   return args;
+}
+
+function topLevelCommandCall(cmd) {
+  const m = String(cmd || "").match(/^\s*(?:[A-Za-z_]\w*(?:\([^)]*\))?\s*(?::=|=(?!=)|:)\s*)?([A-Z][A-Za-z0-9_]*)\s*\(([\s\S]*)\)\s*$/);
+  if (!m) return null;
+  return { name: m[1], args: topLevelArgs(m[2]) };
+}
+
+function hasFreeXYExpression(arg) {
+  const s = stripStringLiterals(arg);
+  const hasFreeXY = /(^|[^A-Za-z0-9_])x([^A-Za-z0-9_]|$)/.test(s) || /(^|[^A-Za-z0-9_])y([^A-Za-z0-9_]|$)/.test(s);
+  const hasAlgebra = /[=+\-*/^]/.test(s);
+  const looksLikePoint = /^\s*\([^,]+,[^,]+\)\s*$/.test(s);
+  return hasFreeXY && hasAlgebra && !looksLikePoint;
+}
+
+function sourceCommandIssues(scene) {
+  const errors = [];
+  const warnings = [];
+  (scene.objects || []).forEach((o, i) => {
+    const cmd = cmdOf(o);
+    const call = topLevelCommandCall(cmd);
+    if (!call) return;
+    if (!DOCUMENTED_TOP_LEVEL_COMMANDS.has(call.name)) {
+      warnings.push({
+        index: i,
+        cmd,
+        reason: `${call.name}(...) is not documented in references/commands.md; verify it with check before relying on it.`
+      });
+    }
+    if (call.args.length === 1 && hasFreeXYExpression(call.args[0])) {
+      errors.push({
+        index: i,
+        cmd,
+        reason: `${call.name}(...) wraps a single algebraic x/y expression. Use a direct equation label, function definition, or Curve(...), unless references/commands.md documents this exact command signature.`
+      });
+    }
+  });
+  return { errors, warnings };
 }
 
 function desktopCompatibilityIssues(scene) {
@@ -585,6 +639,13 @@ function doValidate(args) {
     if (impl.length) W(`objects[${i}] may be missing explicit * (for example "${impl[0]}" should be "${impl[0][0]}*${impl[0][1]}"): ${cmd}`);
     if (/\)\(/.test(lintCmd)) W(`objects[${i}] contains ")("; it may be missing *: ${cmd}`);
   });
+  const sourceIssues = sourceCommandIssues(scene);
+  for (const issue of sourceIssues.warnings) {
+    W(`objects[${issue.index}] uses an undocumented top-level command: ${issue.reason} Command: ${issue.cmd}`);
+  }
+  for (const issue of sourceIssues.errors) {
+    E(`objects[${issue.index}] uses an unstable algebraic command pattern: ${issue.reason} Command: ${issue.cmd}`);
+  }
   for (const issue of desktopCompatibilityIssues(scene)) {
     E(`objects[${issue.index}] is not desktop-stable: ${issue.reason} Command: ${issue.cmd}`);
   }
@@ -676,8 +737,27 @@ async function doCheck(args) {
     const build = await page.evaluate(() => window.__BUILD__);
     for (const l of build.lines) console.log((l.ok ? green("  ✓ ") : red("  ✗ ")) + `[${l.i + 1}] ${l.cmd}`);
     let fail = 0;
-    if (!build.ok) { fail++; console.log(red("  ✗ Build contains failed commands")); }
+    if (!build.ok) {
+      fail++;
+      console.log(red("  ✗ Build contains failed commands"));
+      for (const e of build.errors || []) {
+        const label = typeof e.i === "number" && e.i >= 0 ? `objects[${e.i}]` : "scene";
+        console.log(red("    - ") + `${label}: ${e.reason || e.cmd || "unknown build error"}`);
+      }
+    }
     else console.log(green("  ✓ All commands built successfully"));
+
+    const sourceCommand = sourceCommandIssues(scene);
+    for (const issue of sourceCommand.warnings) {
+      console.log(yellow("  ⚠ ") + `objects[${issue.index}] uses an undocumented top-level command: ${issue.reason}`);
+    }
+    if (sourceCommand.errors.length) {
+      fail += sourceCommand.errors.length;
+      console.log(red("  ✗ Scene contains unstable algebraic command patterns:"));
+      for (const issue of sourceCommand.errors) console.log(red("    - ") + `objects[${issue.index}]: ${issue.reason}`);
+    } else {
+      console.log(green("  ✓ Algebraic objects avoid guessed expression-wrapper commands"));
+    }
 
     const sourceDesktopIssues = desktopCompatibilityIssues(scene);
     if (sourceDesktopIssues.length) {
@@ -751,6 +831,10 @@ async function doExport(args) {
   const out = args.o ? path.resolve(args.o) : path.join(dir, safeName(scene) + ".ggb");
   console.log(bold(`headless export -> ${out}`) + dim(` (${info.label}; target: ${info.target})`));
   console.log(dim(`  Support note: ${info.note}.`));
+  const sourceCommand = sourceCommandIssues(scene);
+  if (sourceCommand.errors.length) {
+    die(`Scene contains unstable algebraic command patterns; refusing to export:\n${sourceCommand.errors.map((issue) => `  - objects[${issue.index}]: ${issue.reason}`).join("\n")}`);
+  }
   await withPage(scene, async (page) => {
     const build = await page.evaluate(() => window.__BUILD__);
     if (!build.ok) console.log(yellow("  ⚠ Build contains failed commands; exported .ggb may be incomplete. Run check first."));
